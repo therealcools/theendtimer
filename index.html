@@ -1,62 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>The End Timer</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: black;
-      color: white;
-      text-align: center;
-      padding-top: 20%;
-    }
-    #countdown {
-      font-size: 48px;
-    }
-    #startBtn {
-      font-size: 24px;
-      padding: 10px 20px;
-      margin-top: 20px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Countdown Timer</title>
+<style>
+  body, html {
+    margin: 0; padding: 0;
+    height: 100%;
+    background-color: #ffeb3b; /* bright yellow */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    user-select: none;
+    cursor: pointer;
+  }
+  #label {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  #timer {
+    color: white;
+    font-size: 100px;
+    font-weight: bold;
+  }
+</style>
 </head>
 <body>
-  <h1>Click to Begin Countdown</h1>
-  <button id="startBtn">Start</button>
-  <div id="countdown" style="display:none;"></div>
-  <audio id="bgmusic" src="music.mp3" loop></audio>
 
-  <script>
-    document.getElementById("startBtn").onclick = function () {
-      document.getElementById("startBtn").style.display = "none";
-      document.querySelector("h1").style.display = "none";
-      document.getElementById("countdown").style.display = "block";
+<div id="label">school ends in:</div>
+<div id="timer">Loading...</div>
 
-      document.getElementById("bgmusic").play();
+<audio id="music" src="music.mp3" loop></audio>
 
-      const countdown = document.getElementById("countdown");
-      const endTime = new Date("May 27, 2025 13:00:00").getTime();
+<script>
+  const timerEl = document.getElementById('timer');
+  const music = document.getElementById('music');
 
-      function updateTimer() {
-        const now = new Date().getTime();
-        const distance = endTime - now;
+  // Set countdown target date/time (May 27, 1 PM)
+  const targetDate = new Date('May 27, 2025 13:00:00').getTime();
 
-        if (distance <= 0) {
-          countdown.innerHTML = "Time's up!";
-          return;
-        }
+  let countdownInterval;
+  let started = false;
 
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  function updateTimer() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
 
-        countdown.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      }
+    if (distance < 0) {
+      clearInterval(countdownInterval);
+      timerEl.textContent = "It's over!";
+      music.pause();
+      return;
+    }
 
-      updateTimer();
-      setInterval(updateTimer, 1000);
-    };
-  </script>
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor(
+      (distance % (1000 * 60 * 60)) / (1000 * 60)
+    );
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerEl.textContent =
+      (days > 0 ? days + "d " : "") +
+      String(hours).padStart(2, '0') + ":" +
+      String(minutes).padStart(2, '0') + ":" +
+      String(seconds).padStart(2, '0');
+  }
+
+  function startCountdown() {
+    if (started) return; // only start once
+    started = true;
+
+    music.play().catch(e => {
+      // play might fail if browser blocks auto-play, but since we require click it should be fine
+      console.log('Audio play failed:', e);
+    });
+
+    updateTimer();
+    countdownInterval = setInterval(updateTimer, 1000);
+  }
+
+  // Start countdown & music on any click anywhere on the page
+  document.body.addEventListener('click', startCountdown);
+</script>
+
 </body>
 </html>
