@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Countdown Timer</title>
 <style>
-  body, html {
+  html, body {
     margin: 0; padding: 0;
     height: 100%;
-    background-color: #ffeb3b; /* bright yellow */
+    background: linear-gradient(135deg, #ffeb3b, #ff9800);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -22,26 +22,43 @@
     font-size: 24px;
     margin-bottom: 10px;
     font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  #label.visible {
+    opacity: 1;
   }
   #timer {
     color: white;
     font-size: 100px;
     font-weight: bold;
   }
+  #footer {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    opacity: 0.5;
+    user-select: text;
+  }
 </style>
 </head>
 <body>
 
 <div id="label">school ends in:</div>
-<div id="timer">Loading...</div>
+<div id="timer">CLICK TO SHOW...</div>
 
-<audio id="music" src="music.mp3" loop></audio>
+<div id="footer">website is by therealcools (yes i used chatgpt)</div>
+
+<audio id="music" src="fortniteaudio.mp3" loop></audio>
 
 <script>
   const timerEl = document.getElementById('timer');
+  const labelEl = document.getElementById('label');
   const music = document.getElementById('music');
 
-  // Set countdown target date/time (May 27, 1 PM)
   const targetDate = new Date('May 27, 2025 13:00:00').getTime();
 
   let countdownInterval;
@@ -75,11 +92,11 @@
   }
 
   function startCountdown() {
-    if (started) return; // only start once
+    if (started) return;
     started = true;
 
+    labelEl.classList.add('visible'); // show "school ends in:"
     music.play().catch(e => {
-      // play might fail if browser blocks auto-play, but since we require click it should be fine
       console.log('Audio play failed:', e);
     });
 
@@ -87,7 +104,6 @@
     countdownInterval = setInterval(updateTimer, 1000);
   }
 
-  // Start countdown & music on any click anywhere on the page
   document.body.addEventListener('click', startCountdown);
 </script>
 
