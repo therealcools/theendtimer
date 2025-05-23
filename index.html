@@ -15,6 +15,8 @@
     align-items: center;
     font-family: Arial, sans-serif;
     user-select: none;
+    overflow: hidden;
+    transition: background 3s ease;
     cursor: pointer;
   }
   #label {
@@ -32,6 +34,7 @@
     color: white;
     font-size: 100px;
     font-weight: bold;
+    transition: transform 3s ease, opacity 2s ease;
   }
   #footer {
     position: fixed;
@@ -42,6 +45,22 @@
     font-size: 12px;
     opacity: 0.5;
     user-select: text;
+    transition: transform 3s ease, opacity 2s ease;
+  }
+  #portal {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, #00f, #000);
+    border-radius: 50%;
+    animation: pulse 2s infinite ease-in-out;
+    z-index: 10;
+    display: none;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
   }
 </style>
 </head>
@@ -49,15 +68,17 @@
 
 <div id="label">school ends in:</div>
 <div id="timer">CLICK TO SHOW...</div>
+<div id="footer">website is by therealcools (yes i used chatgpt)</div>
+<div id="portal"></div>
 
-<div id="footer">website made by therealcools (yes i used chatgpt)</div>
-
-<audio id="music" src="music.mp3" loop></audio>
+<audio id="music" src="fortniteaudio.mp3" loop></audio>
 
 <script>
-  const timerEl = document.getElementById('timer');
   const labelEl = document.getElementById('label');
+  const timerEl = document.getElementById('timer');
+  const footerEl = document.getElementById('footer');
   const music = document.getElementById('music');
+  const portal = document.getElementById('portal');
 
   const targetDate = new Date('May 27, 2025 13:00:00').getTime();
 
@@ -68,20 +89,15 @@
     const now = new Date().getTime();
     const distance = targetDate - now;
 
-    if (distance < 0) {
+    if (distance <= 0) {
       clearInterval(countdownInterval);
-      timerEl.textContent = "It's over!, enjoy everyone!";
-      music.pause();
+      triggerPortalEffect();
       return;
     }
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-    const minutes = Math.floor(
-      (distance % (1000 * 60 * 60)) / (1000 * 60)
-    );
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     timerEl.textContent =
@@ -91,15 +107,35 @@
       String(seconds).padStart(2, '0');
   }
 
+  function triggerPortalEffect() {
+    document.body.style.background = "#000"; // fade to black
+    portal.style.display = "block";
+
+    // suck-in effect
+    timerEl.style.transform = "scale(0)";
+    timerEl.style.opacity = "0";
+    labelEl.style.transform = "scale(0)";
+    labelEl.style.opacity = "0";
+    footerEl.style.transform = "scale(0)";
+    footerEl.style.opacity = "0";
+
+    // fade music out
+    const fadeAudio = setInterval(() => {
+      if (music.volume > 0.05) {
+        music.volume -= 0.05;
+      } else {
+        music.pause();
+        clearInterval(fadeAudio);
+      }
+    }, 200);
+  }
+
   function startCountdown() {
     if (started) return;
     started = true;
 
-    labelEl.classList.add('visible'); // show "school ends in:"
-    music.play().catch(e => {
-      console.log('Audio play failed:', e);
-    });
-
+    labelEl.classList.add('visible');
+    music.play().catch(e => console.log('Audio failed:', e));
     updateTimer();
     countdownInterval = setInterval(updateTimer, 1000);
   }
