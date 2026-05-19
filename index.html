@@ -2,145 +2,382 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Countdown Timer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>School Ends Countdown</title>
+
 <style>
-  html, body {
-    margin: 0; padding: 0;
-    height: 100%;
-    background: linear-gradient(135deg, #000000, #800080);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    user-select: none;
-    overflow: hidden;
-    transition: background 3s ease;
-    cursor: pointer;
-  }
-  #label {
-    color: white;
-    font-size: 24px;
-    margin-bottom: 10px;
-    font-weight: 500;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  #label.visible {
-    opacity: 1;
-  }
-  #timer {
-    color: white;
-    font-size: 100px;
-    font-weight: bold;
-    transition: transform 3s ease, opacity 2s ease;
-  }
-  #footer {
-    position: fixed;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    color: white;
-    font-size: 12px;
-    opacity: 0.5;
-    user-select: text;
-    transition: transform 3s ease, opacity 2s ease;
-  }
-  #portal {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, #00f, #000);
-    border-radius: 50%;
-    animation: pulse 2s infinite ease-in-out;
-    z-index: 10;
-    display: none;
-  }
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.7; }
-  }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        background: black;
+        color: white;
+        height: 100vh;
+    }
+
+    /* =========================
+       START SCREEN
+    ========================= */
+    #start-screen {
+        position: fixed;
+        inset: 0;
+        background: url("startbg.png") center center / cover no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        cursor: pointer;
+        transition: opacity 0.8s ease;
+    }
+
+    #start-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .start-text {
+        font-size: 4.5rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 40px;
+        text-shadow:
+            0 0 10px black,
+            0 0 25px black,
+            0 0 50px black;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+
+    /* =========================
+       MAIN WEBSITE
+    ========================= */
+
+    #main-content {
+        display: none;
+    }
+
+    /* Background Videos */
+    .bg-video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -2;
+    }
+
+    /* Overlay */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: -1;
+    }
+
+    /* Main Container */
+    .container {
+        position: relative;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 4rem;
+        margin-bottom: 10px;
+        text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    .credits {
+        font-size: 1rem;
+        opacity: 0.5;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+    }
+
+    #countdown {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 50px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .time-box {
+        background: rgba(255,255,255,0.12);
+        padding: 20px;
+        border-radius: 15px;
+        min-width: 120px;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    .number {
+        font-size: 3rem;
+        font-weight: bold;
+    }
+
+    .label {
+        font-size: 1rem;
+        opacity: 0.8;
+        margin-top: 5px;
+    }
+
+    /* Oi Hughie Corner */
+    .oi-corner {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .oi-title {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        text-shadow: 0 0 15px black;
+    }
+
+    .spin-image {
+        width: 180px;
+        height: 180px;
+        animation: spin 6s linear infinite;
+        object-fit: contain;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* =========================
+       END SCREEN
+    ========================= */
+
+    #end-screen {
+        position: fixed;
+        inset: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 5000;
+    }
+
+    #end-video {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -2;
+    }
+
+    .end-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: -1;
+    }
+
+    .hooray-text {
+        font-size: 7rem;
+        font-weight: bold;
+        text-shadow:
+            0 0 20px black,
+            0 0 40px black,
+            0 0 80px black;
+        animation: pulse 2s infinite;
+    }
+
+    @media (max-width: 700px) {
+        .start-text {
+            font-size: 2.2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .number {
+            font-size: 2rem;
+        }
+
+        .time-box {
+            min-width: 90px;
+            padding: 15px;
+        }
+
+        .spin-image {
+            width: 130px;
+            height: 130px;
+        }
+
+        .hooray-text {
+            font-size: 4rem;
+        }
+    }
 </style>
 </head>
 <body>
 
-<div id="label" style="color: #000000;">the exams fill u with determination:</div>
-<div id="timer">final countdown..</div>
-<div id="footer">website is by therealcools (yes i used chatgpt)</div>
-<div id="portal"></div>
+<!-- =========================
+     START SCREEN
+========================= -->
+<div id="start-screen">
+    <div class="start-text">
+        excuse me sir,<br>
+        press here to start,<br>
+        capiche?
+    </div>
+</div>
 
-<audio id="music" src="music.mp3" loop></audio>
+<!-- =========================
+     MAIN WEBSITE
+========================= -->
+<div id="main-content">
+
+    <!-- Main Background Video -->
+    <video autoplay muted loop playsinline class="bg-video" id="main-video">
+        <source src="lebackground.mp4" type="video/mp4">
+    </video>
+
+    <!-- Music -->
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="overlay"></div>
+
+    <div class="container">
+        <h1>school ends in:</h1>
+        <div class="credits">(made by cools and le chat gpt)</div>
+
+        <div id="countdown">
+            <div class="time-box">
+                <div class="number" id="days">0</div>
+                <div class="label">Days</div>
+            </div>
+
+            <div class="time-box">
+                <div class="number" id="hours">0</div>
+                <div class="label">Hours</div>
+            </div>
+
+            <div class="time-box">
+                <div class="number" id="minutes">0</div>
+                <div class="label">Minutes</div>
+            </div>
+
+            <div class="time-box">
+                <div class="number" id="seconds">0</div>
+                <div class="label">Seconds</div>
+            </div>
+        </div>
+
+        <!-- Oi Hughie Corner -->
+        <div class="oi-corner">
+            <div class="oi-title">oi hughie corner</div>
+            <img src="oihughie.png" alt="Spinning Image" class="spin-image">
+        </div>
+    </div>
+</div>
+
+<!-- =========================
+     END SCREEN
+========================= -->
+<div id="end-screen">
+
+    <video autoplay muted loop playsinline id="end-video">
+        <source src="endbg.mp4" type="video/mp4">
+    </video>
+
+    <div class="end-overlay"></div>
+
+    <div class="hooray-text">
+        hooray
+    </div>
+
+</div>
 
 <script>
-  const labelEl = document.getElementById('label');
-  const timerEl = document.getElementById('timer');
-  const footerEl = document.getElementById('footer');
-  const music = document.getElementById('music');
-  const portal = document.getElementById('portal');
+    // =========================
+    // START SCREEN
+    // =========================
+    const startScreen = document.getElementById("start-screen");
+    const mainContent = document.getElementById("main-content");
+    const music = document.getElementById("bg-music");
 
-  const targetDate = new Date('May 27, 2025 15:41:00').getTime();
+    startScreen.addEventListener("click", () => {
 
-  let countdownInterval;
-  let started = false;
+        // Show website
+        mainContent.style.display = "block";
 
-  function updateTimer() {
-    const now = new Date().getTime();
-    const distance = targetDate - now;
+        // Fade start screen away
+        startScreen.classList.add("hidden");
 
-    if (distance <= 0) {
-      clearInterval(countdownInterval);
-      triggerPortalEffect();
-      return;
+        // Start music
+        music.play().catch(err => {
+            console.log("Music blocked:", err);
+        });
+
+        // Remove start screen after fade
+        setTimeout(() => {
+            startScreen.style.display = "none";
+        }, 800);
+    });
+
+    // =========================
+    // COUNTDOWN
+    // =========================
+    const targetDate = new Date("May 20, 2026 15:00:00").getTime();
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        // TIMER ENDED
+        if (distance <= 0) {
+
+            // Hide main content
+            mainContent.style.display = "none";
+
+            // Show end screen
+            document.getElementById("end-screen").style.display = "flex";
+
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerText = days;
+        document.getElementById("hours").innerText = hours;
+        document.getElementById("minutes").innerText = minutes;
+        document.getElementById("seconds").innerText = seconds;
     }
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    timerEl.textContent =
-      (days > 0 ? days + "d " : "") +
-      String(hours).padStart(2, '0') + ":" +
-      String(minutes).padStart(2, '0') + ":" +
-      String(seconds).padStart(2, '0');
-  }
-
-  function triggerPortalEffect() {
-    document.body.style.background = "#000"; // fade to black
-    portal.style.display = "block";
-
-    // suck-in effect
-    timerEl.style.transform = "scale(0)";
-    timerEl.style.opacity = "0";
-    labelEl.style.transform = "scale(0)";
-    labelEl.style.opacity = "0";
-    footerEl.style.transform = "scale(0)";
-    footerEl.style.opacity = "0";
-
-    // fade music out
-    const fadeAudio = setInterval(() => {
-      if (music.volume > 0.05) {
-        music.volume -= 0.05;
-      } else {
-        music.pause();
-        clearInterval(fadeAudio);
-      }
-    }, 200);
-  }
-
-  function startCountdown() {
-    if (started) return;
-    started = true;
-
-    labelEl.classList.add('visible');
-    music.play().catch(e => console.log('Audio failed:', e));
-    updateTimer();
-    countdownInterval = setInterval(updateTimer, 1000);
-  }
-
-  document.body.addEventListener('click', startCountdown);
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 </script>
 
 </body>
